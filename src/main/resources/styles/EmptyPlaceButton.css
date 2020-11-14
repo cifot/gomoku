@@ -1,0 +1,37 @@
+.empty-place-button {
+    -fx-content-display: graphic-only;
+    -fx-graphic-text-gap: 0.0;
+    -fx-min-height: 10.0;
+    -fx-pref-height: 18.0;
+    -fx-min-width: 10.0;
+    -fx-pref-width: 18.0;
+    -fx-background-color: #c0c0c0;
+    -fx-background-radius: 50;
+}
+
+.empty-place-button:hover {
+    -fx-opacity: 1;
+    -fx-content-display: graphic-only;
+    -fx-graphic-text-gap: 0.0;
+    -fx-min-height: 10.0;
+    -fx-pref-height: 18.0;
+    -fx-min-width: 10.0;
+    -fx-pref-width: 18.0;
+    -fx-border-radius: 50;
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 50;
+    -fx-border-width: 2;
+}
+
+.empty-place-button:disabled {
+    -fx-opacity: 1;
+    -fx-content-display: graphic-only;
+    -fx-graphic-text-gap: 0.0;
+    -fx-min-height: 10.0;
+    -fx-pref-height: 32.0;
+    -fx-min-width: 10.0;
+    -fx-pref-width: 32.0;
+    -fx-border-radius: 50;
+    -fx-background-radius: 50;
+    -fx-border-width: 2;
+}
