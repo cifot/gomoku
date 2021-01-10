@@ -7,7 +7,8 @@ import sample.game.rules.interfaces.CheckGameEnd;
 import sample.game.rules.interfaces.CheckPutOnPlace;
 
 public class MainRule extends Rule
-        implements CheckPutOnPlace,
+        implements
+        CheckPutOnPlace,
         CheckGameEnd {
     @Override
     public boolean canPutOnPlace(Board board, int i, int j, PlaceState color) {
