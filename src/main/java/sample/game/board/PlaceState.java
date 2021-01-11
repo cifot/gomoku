@@ -1,12 +1,13 @@
 package sample.game.board;
 
 public enum PlaceState {
-    EMPTY, WHITE, BLACK;
+    AVAILABLE, WHITE, BLACK, AVAILABLE_ONLY_BLACK, AVAILABLE_ONLY_WHITE ;
 
     public String getStyle() {
         String style;
         switch (this) {
-            case BLACK -> style = "    -fx-content-display: graphic-only;\n" +
+            case BLACK -> style =
+                    "    -fx-content-display: graphic-only;\n" +
                     "    -fx-graphic-text-gap: 0.0;\n" +
                     "    -fx-min-height: 10.0;\n" +
                     "    -fx-pref-height: 32.0;\n" +
@@ -15,7 +16,8 @@ public enum PlaceState {
                     "    -fx-background-color: #000000;\n" +
                     "    -fx-background-radius: 50";
 
-            case WHITE -> style = "    -fx-content-display: graphic-only;\n" +
+            case WHITE -> style =
+                    "    -fx-content-display: graphic-only;\n" +
                     "    -fx-graphic-text-gap: 0.0;\n" +
                     "    -fx-min-height: 10.0;\n" +
                     "    -fx-pref-height: 32.0;\n" +
@@ -24,7 +26,8 @@ public enum PlaceState {
                     "    -fx-background-color: #ffffff;\n" +
                     "    -fx-background-radius: 50";
 
-            case EMPTY -> style = "    -fx-content-display: graphic-only;\n" +
+            case AVAILABLE, AVAILABLE_ONLY_BLACK, AVAILABLE_ONLY_WHITE -> style =
+                    "    -fx-content-display: graphic-only;\n" +
                     "    -fx-graphic-text-gap: 0.0;\n" +
                     "    -fx-min-height: 10.0;\n" +
                     "    -fx-pref-height: 18.0;\n" +

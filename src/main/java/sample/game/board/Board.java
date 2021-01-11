@@ -29,7 +29,7 @@ public class Board {
         IntStream.range(0, size).forEach(i -> blackSequenceMap.add(new ArrayList<>(size)));
 
 
-        IntStream.range(0, size).forEach(i -> {for (int j = 0; j < size; j++) {board.get(i).add(PlaceState.EMPTY);}});
+        IntStream.range(0, size).forEach(i -> {for (int j = 0; j < size; j++) {board.get(i).add(PlaceState.AVAILABLE);}});
         IntStream.range(0, size).forEach(i -> {for (int j = 0; j < size; j++) {whiteSequenceMap.get(i).add(null);}});
         IntStream.range(0, size).forEach(i -> {for (int j = 0; j < size; j++) {blackSequenceMap.get(i).add(null);}});
     }
