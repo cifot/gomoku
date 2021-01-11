@@ -22,7 +22,6 @@ public class Board {
     List<List<Sequence>> blackSequenceMap = new ArrayList<>(size);
     Rules rules;
 
-
     Board(Rules rules) {
         this.rules = rules;
         IntStream.range(0, size).forEach(i -> board.add(new ArrayList<>(size)));
