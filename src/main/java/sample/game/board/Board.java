@@ -44,7 +44,6 @@ public class Board {
             throw new BadPlaceException();
         }
         board.get(i).set(j, placeState);
-
         rules.getRules(ActionAfterMove.class)
                 .forEach(rule -> ((ActionAfterMove)rule).actionAfterMove(this, i, j, placeState));
     }
