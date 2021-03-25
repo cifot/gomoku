@@ -1,70 +1,79 @@
 package sample.game.board;
 
-import sample.game.board.sequence.Sequence;
+import lombok.Getter;
 import sample.game.exception.BadPlaceException;
-import sample.game.rules.Rule;
-import sample.game.rules.Rules;
-import sample.game.rules.interfaces.ActionAfterMove;
-import sample.game.rules.interfaces.CheckGameEnd;
-import sample.game.rules.interfaces.CheckPutOnPlace;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
+import java.util.Arrays;
 
+/*
+Отсчет координат происходит с верхнего-левого угла
+Отсчет левых диагоналей происходит с верхнего-правого угла и идет вниз
+Отсчет правых диагоналей происходит с верхнего-левого угла и идет вниз
+ */
+@Getter
 public class Board {
+    Weight weight = new Weight(5, 4);
     final int size = 19;
-    final int winSize = 5;
-    List<List<PlaceState>> board = new ArrayList<>(size);
-    List<Sequence> whiteSequences = new ArrayList<>(128);
-    List<List<Sequence>> whiteSequenceMap = new ArrayList<>(size);
-    List<Sequence> blackSequences = new ArrayList<>(128);
-    List<List<Sequence>> blackSequenceMap = new ArrayList<>(size);
-    Rules rules;
+    final int winLength = 5;
+    Color[][][] stoneBoards = new Color[ArrayType.values().length][][];
 
-    Board(Rules rules) {
-        this.rules = rules;
-        IntStream.range(0, size).forEach(i -> board.add(new ArrayList<>(size)));
-        IntStream.range(0, size).forEach(i -> whiteSequenceMap.add(new ArrayList<>(size)));
-        IntStream.range(0, size).forEach(i -> blackSequenceMap.add(new ArrayList<>(size)));
+    public Board() {
+        stoneBoards[ArrayType.Horizontals.getValue()] = new Color[size][size];
+        stoneBoards[ArrayType.Vertical.getValue()] = new Color[size][size];
+        stoneBoards[ArrayType.RightDiagonals.getValue()] = new Color[size * 2 - 1][];
+        stoneBoards[ArrayType.LeftDiagonals.getValue()] = new Color[size * 2 - 1][];
 
-
-        IntStream.range(0, size).forEach(i -> {for (int j = 0; j < size; j++) {board.get(i).add(PlaceState.AVAILABLE);}});
-        IntStream.range(0, size).forEach(i -> {for (int j = 0; j < size; j++) {whiteSequenceMap.get(i).add(null);}});
-        IntStream.range(0, size).forEach(i -> {for (int j = 0; j < size; j++) {blackSequenceMap.get(i).add(null);}});
+        int tmpValue = size - 1;
+        for (int i = 0; i < stoneBoards[ArrayType.LeftDiagonals.getValue()].length; i++) {
+            final int diagonalSize = Math.abs(tmpValue - Math.abs(tmpValue - i)) + 1;
+            stoneBoards[ArrayType.LeftDiagonals.getValue()][i] = new Color[diagonalSize];
+            stoneBoards[ArrayType.RightDiagonals.getValue()][i] = new Color[diagonalSize];
+        }
+        for (Color[][] stoneBoard : stoneBoards) {
+            for (Color[] line : stoneBoard) {
+                Arrays.fill(line, null);
+            }
+        }
     }
 
-    private boolean canPutOnPlace(PlaceState placeState, int i, int j) {
-        return rules.getRules(CheckPutOnPlace.class).stream()
-                .allMatch(rule -> ((CheckPutOnPlace)rule).canPutOnPlace(this, i, j, placeState));
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
-    public void put(PlaceState placeState, int i, int j) {
-        if (!canPutOnPlace(placeState, i, j)) {
+    public void putStone(Color color, int column, int line) {
+        System.out.println(color);
+        System.out.println(line);
+        System.out.println(column);
+        System.out.printf("right size:%d pos:%d%n", stoneBoards[ArrayType.RightDiagonals.getValue()][column + line].length, Integer.min(line, size - column - 1));
+        System.out.printf("left size:%d pos:%d%n", stoneBoards[ArrayType.LeftDiagonals.getValue()][size - 1 - column + line].length, Integer.min(line, column));
+        if (stoneBoards[ArrayType.Vertical.getValue()][column][line] == null) {
+            stoneBoards[ArrayType.Vertical.getValue()][column][line] = color;
+            stoneBoards[ArrayType.Horizontals.getValue()][line][column] = color;
+            stoneBoards[ArrayType.LeftDiagonals.getValue()][size - 1 - column + line][Integer.min(line, column)] = color;
+            stoneBoards[ArrayType.RightDiagonals.getValue()][column + line][Integer.min(line, size - column - 1)] = color;
+        } else {
             throw new BadPlaceException();
         }
-        board.get(i).set(j, placeState);
-        rules.getRules(ActionAfterMove.class)
-                .forEach(rule -> ((ActionAfterMove)rule).actionAfterMove(this, i, j, placeState));
     }
 
-    public List<List<PlaceState>> getBoard() {
-        return board;
-    }
-
-    public boolean isGameEnd() {
-        return rules.getRules(CheckGameEnd.class).stream().allMatch(rule -> ((CheckGameEnd)rule).isGameEnd(this));
-    }
-
-    public List<Sequence> getWhiteSequences() {
-        return whiteSequences;
-    }
-
-    public List<Sequence> getBlackSequences() {
-        return blackSequences;
-    }
-
-    public int getWinSize() {
-        return winSize;
+    public long getScore(Color color) {
+        long score = 0L;
+        for (Color[][] stoneBoard: stoneBoards) {
+            for (Color[] line : stoneBoard) {
+                int size = line.length;
+                for (int j = 0; j < line.length; j++) {
+                    while (line[j] != color) {
+                        j++;
+                    }
+                    int startPos = j;
+                    while (j < size && line[j] == color) {
+                        j++;
+                    }
+                    score += weight.getWeight(j - startPos);
+                }
+            }
+        }
+        return score;
     }
 }

@@ -9,15 +9,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import sample.game.board.Board;
+import sample.game.board.Color;
 
 public class Controller {
 
-    private final String whiteStoneStyle = "-fx-background-color: #FFFFFF;" +
-            "-fx-border-color: #707070;";
-
-    private final String blackStoneStyle = "-fx-background-color: #333333;" +
-            "-fx-border-color: #222222;";
-
+    private Color color = Color.WHITE;
+    private Board board;
     private final String emptyPlaceStyle = "-fx-border-width: 0;" +
             "-fx-pref-width: 18.0;" +
             "-fx-pref-height: 18.0;" +
@@ -52,7 +50,9 @@ public class Controller {
     void actionEmptyPlaceButton(ActionEvent event) {
         Button emptyPlaceButton = (Button) event.getSource();
         emptyPlaceButton.setDisable(true);
-        emptyPlaceButton.setStyle(whiteStoneStyle);
+        board.putStone(color, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
+        emptyPlaceButton.setStyle(color.getStyle());
+        color = color == Color.WHITE ? Color.BLACK : Color.WHITE;
     }
 
     @FXML
@@ -65,12 +65,9 @@ public class Controller {
 
     @FXML
     void actionStartButton(ActionEvent event) {
+        board = new Board();
         gridPane.getChildren().forEach(e -> {e.setStyle(emptyPlaceStyle);
                                              e.setDisable(false);});
-        gridPane.getChildren().stream().
-                filter(button -> GridPane.getRowIndex(button) == (size - 1) / 2
-                        && GridPane.getColumnIndex(button) == (size - 1) / 2)
-                .forEach(button -> {button.setDisable(true); button.setStyle(blackStoneStyle);});
         menu.setVisible(false);
         game.setVisible(true);
         continueButton.setDisable(false);
