@@ -43,7 +43,10 @@ public class Controller {
     private Button continueButton;
 
     @FXML
-    private Button startButton;
+    private Button startButton1;
+
+    @FXML
+    private Button startButton2;
 
 
     @FXML
@@ -51,6 +54,9 @@ public class Controller {
         Button emptyPlaceButton = (Button) event.getSource();
         emptyPlaceButton.setDisable(true);
         board.putStone(color, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
+        if (board.getScore(color) >= Integer.MAX_VALUE) {
+            System.out.println(color);
+        }
         emptyPlaceButton.setStyle(color.getStyle());
         color = color == Color.WHITE ? Color.BLACK : Color.WHITE;
     }
@@ -64,7 +70,7 @@ public class Controller {
     }
 
     @FXML
-    void actionStartButton(ActionEvent event) {
+    void actionStartButton2(ActionEvent event) {
         board = new Board();
         gridPane.getChildren().forEach(e -> {e.setStyle(emptyPlaceStyle);
                                              e.setDisable(false);});

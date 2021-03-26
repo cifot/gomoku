@@ -42,11 +42,6 @@ public class Board {
     }
 
     public void putStone(Color color, int column, int line) {
-        System.out.println(color);
-        System.out.println(line);
-        System.out.println(column);
-        System.out.printf("right size:%d pos:%d%n", stoneBoards[ArrayType.RightDiagonals.getValue()][column + line].length, Integer.min(line, size - column - 1));
-        System.out.printf("left size:%d pos:%d%n", stoneBoards[ArrayType.LeftDiagonals.getValue()][size - 1 - column + line].length, Integer.min(line, column));
         if (stoneBoards[ArrayType.Vertical.getValue()][column][line] == null) {
             stoneBoards[ArrayType.Vertical.getValue()][column][line] = color;
             stoneBoards[ArrayType.Horizontals.getValue()][line][column] = color;
@@ -63,11 +58,11 @@ public class Board {
             for (Color[] line : stoneBoard) {
                 int size = line.length;
                 for (int j = 0; j < line.length; j++) {
-                    while (line[j] != color) {
+                    while (j < line.length && line[j] != color) {
                         j++;
                     }
                     int startPos = j;
-                    while (j < size && line[j] == color) {
+                    while (j < line.length && line[j] == color) {
                         j++;
                     }
                     score += weight.getWeight(j - startPos);
