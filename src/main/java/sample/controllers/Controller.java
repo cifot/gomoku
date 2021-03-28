@@ -3,29 +3,27 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import sample.game.board.Board;
-import sample.game.board.Color;
+import sample.game.board.PlaceState;
 
 public class Controller {
 
-    private Color color = Color.WHITE;
+    private PlaceState color;
     private Board board;
-    private final String emptyPlaceStyle = "-fx-border-width: 0;" +
-            "-fx-pref-width: 18.0;" +
-            "-fx-pref-height: 18.0;" +
-            "-fx-background-color: #c0c0c0;";
 
     final int size = 19;
 
 
     @FXML
     private ResourceBundle resources;
+
+    @FXML
+    private AnchorPane helpMenu;
 
     @FXML
     private URL location;
@@ -50,6 +48,12 @@ public class Controller {
 
 
     @FXML
+    void actionHelpButton(ActionEvent event) {
+        menu.setVisible(false);
+        helpMenu.setVisible(true);
+    }
+
+    @FXML
     void actionEmptyPlaceButton(ActionEvent event) {
         Button emptyPlaceButton = (Button) event.getSource();
         emptyPlaceButton.setDisable(true);
@@ -58,21 +62,28 @@ public class Controller {
             System.out.println(color);
         }
         emptyPlaceButton.setStyle(color.getStyle());
-        color = color == Color.WHITE ? Color.BLACK : Color.WHITE;
+        color = color == PlaceState.WHITE ? PlaceState.BLACK : PlaceState.WHITE;
     }
 
     @FXML
     void gameKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
             game.setVisible(false);
+            helpMenu.setVisible(false);
             menu.setVisible(true);
         }
     }
 
     @FXML
+    void actionStartButton1(ActionEvent event) {
+
+    }
+
+    @FXML
     void actionStartButton2(ActionEvent event) {
-        board = new Board();
-        gridPane.getChildren().forEach(e -> {e.setStyle(emptyPlaceStyle);
+        board = new Board(size);
+        color = PlaceState.WHITE;
+        gridPane.getChildren().forEach(e -> {e.setStyle(PlaceState.AVAILABLE.getStyle());
                                              e.setDisable(false);});
         menu.setVisible(false);
         game.setVisible(true);

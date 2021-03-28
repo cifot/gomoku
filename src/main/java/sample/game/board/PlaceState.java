@@ -1,42 +1,30 @@
 package sample.game.board;
 
 public enum PlaceState {
-    AVAILABLE, WHITE, BLACK, AVAILABLE_ONLY_BLACK, AVAILABLE_ONLY_WHITE ;
+    WHITE("-fx-background-color: #FFFFFF;" +
+            "-fx-border-color: #707070;"),
+    BLACK("-fx-background-color: #333333;" +
+            "-fx-border-color: #222222;"),
+    AVAILABLE_ONLY_WHITE("-fx-border-width: 0;" +
+            "-fx-pref-width: 18.0;" +
+            "-fx-pref-height: 18.0;" +
+            "-fx-background-color: #c0c0c0;"),
+    AVAILABLE_ONLY_BLACK("-fx-border-width: 0;" +
+            "-fx-pref-width: 18.0;" +
+            "-fx-pref-height: 18.0;" +
+            "-fx-background-color: #c0c0c0;"),
+    AVAILABLE("-fx-border-width: 0;" +
+            "-fx-pref-width: 18.0;" +
+            "-fx-pref-height: 18.0;" +
+            "-fx-background-color: #c0c0c0;");
+
+    private final String style;
+
+    PlaceState(String style) {
+        this.style = style;
+    }
 
     public String getStyle() {
-        String style;
-        switch (this) {
-            case BLACK -> style =
-                    "    -fx-content-display: graphic-only;\n" +
-                    "    -fx-graphic-text-gap: 0.0;\n" +
-                    "    -fx-min-height: 10.0;\n" +
-                    "    -fx-pref-height: 32.0;\n" +
-                    "    -fx-min-width: 10.0;\n" +
-                    "    -fx-pref-width: 32.0;\n" +
-                    "    -fx-background-color: #000000;\n" +
-                    "    -fx-background-radius: 50";
-
-            case WHITE -> style =
-                    "    -fx-content-display: graphic-only;\n" +
-                    "    -fx-graphic-text-gap: 0.0;\n" +
-                    "    -fx-min-height: 10.0;\n" +
-                    "    -fx-pref-height: 32.0;\n" +
-                    "    -fx-min-width: 10.0;\n" +
-                    "    -fx-pref-width: 32.0;\n" +
-                    "    -fx-background-color: #ffffff;\n" +
-                    "    -fx-background-radius: 50";
-
-            case AVAILABLE, AVAILABLE_ONLY_BLACK, AVAILABLE_ONLY_WHITE -> style =
-                    "    -fx-content-display: graphic-only;\n" +
-                    "    -fx-graphic-text-gap: 0.0;\n" +
-                    "    -fx-min-height: 10.0;\n" +
-                    "    -fx-pref-height: 18.0;\n" +
-                    "    -fx-min-width: 10.0;\n" +
-                    "    -fx-pref-width: 18.0;\n" +
-                    "    -fx-background-color: #c0c0c0;\n" +
-                    "    -fx-background-radius: 50";
-            default -> throw new RuntimeException("Invalid style");
-        }
         return style;
     }
 }

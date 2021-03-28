@@ -8,11 +8,16 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    private final int width = 800;
+    private final int height = 800;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("../fxml/game.fxml"));
         primaryStage.setTitle("Gomoku");
-        primaryStage.setScene(new Scene(root, 750, 750));
+        primaryStage.setScene(new Scene(root, width, height));
+        primaryStage.setMinHeight(height);
+        primaryStage.setMinWidth(width);
         primaryStage.show();
     }
 

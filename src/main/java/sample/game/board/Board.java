@@ -12,25 +12,26 @@ import java.util.Arrays;
  */
 @Getter
 public class Board {
-    Weight weight = new Weight(5, 4);
-    final int size = 19;
+    Weight weight = new Weight(5, 3);
+    final int size;
     final int winLength = 5;
-    Color[][][] stoneBoards = new Color[ArrayType.values().length][][];
+    PlaceState[][][] stoneBoards = new PlaceState[ArrayType.values().length][][];
 
-    public Board() {
-        stoneBoards[ArrayType.Horizontals.getValue()] = new Color[size][size];
-        stoneBoards[ArrayType.Vertical.getValue()] = new Color[size][size];
-        stoneBoards[ArrayType.RightDiagonals.getValue()] = new Color[size * 2 - 1][];
-        stoneBoards[ArrayType.LeftDiagonals.getValue()] = new Color[size * 2 - 1][];
+    public Board(int size) {
+        this.size = size;
+        stoneBoards[ArrayType.Horizontals.getValue()] = new PlaceState[size][size];
+        stoneBoards[ArrayType.Vertical.getValue()] = new PlaceState[size][size];
+        stoneBoards[ArrayType.RightDiagonals.getValue()] = new PlaceState[size * 2 - 1][];
+        stoneBoards[ArrayType.LeftDiagonals.getValue()] = new PlaceState[size * 2 - 1][];
 
         int tmpValue = size - 1;
         for (int i = 0; i < stoneBoards[ArrayType.LeftDiagonals.getValue()].length; i++) {
             final int diagonalSize = Math.abs(tmpValue - Math.abs(tmpValue - i)) + 1;
-            stoneBoards[ArrayType.LeftDiagonals.getValue()][i] = new Color[diagonalSize];
-            stoneBoards[ArrayType.RightDiagonals.getValue()][i] = new Color[diagonalSize];
+            stoneBoards[ArrayType.LeftDiagonals.getValue()][i] = new PlaceState[diagonalSize];
+            stoneBoards[ArrayType.RightDiagonals.getValue()][i] = new PlaceState[diagonalSize];
         }
-        for (Color[][] stoneBoard : stoneBoards) {
-            for (Color[] line : stoneBoard) {
+        for (PlaceState[][] stoneBoard : stoneBoards) {
+            for (PlaceState[] line : stoneBoard) {
                 Arrays.fill(line, null);
             }
         }
@@ -41,7 +42,7 @@ public class Board {
         return super.clone();
     }
 
-    public void putStone(Color color, int column, int line) {
+    public void putStone(PlaceState color, int column, int line) {
         if (stoneBoards[ArrayType.Vertical.getValue()][column][line] == null) {
             stoneBoards[ArrayType.Vertical.getValue()][column][line] = color;
             stoneBoards[ArrayType.Horizontals.getValue()][line][column] = color;
@@ -52,11 +53,10 @@ public class Board {
         }
     }
 
-    public long getScore(Color color) {
+    public long getScore(PlaceState color) {
         long score = 0L;
-        for (Color[][] stoneBoard: stoneBoards) {
-            for (Color[] line : stoneBoard) {
-                int size = line.length;
+        for (PlaceState[][] stoneBoard: stoneBoards) {
+            for (PlaceState[] line : stoneBoard) {
                 for (int j = 0; j < line.length; j++) {
                     while (j < line.length && line[j] != color) {
                         j++;
