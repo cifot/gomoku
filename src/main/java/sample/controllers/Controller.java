@@ -4,6 +4,7 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -34,10 +35,13 @@ public class Controller {
     private AnchorPane menu;
 
     @FXML
+    private Label winLabel;
+
+    @FXML
     private AnchorPane gamePane;
 
     @FXML
-    private GridPane gridPane;
+    private GridPane boardGridPane;
 
     @FXML
     private Button continueButton;
@@ -62,17 +66,26 @@ public class Controller {
         game.getBoard().putStone(currentColor, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
         emptyPlaceButton.setStyle(currentColor.getStyle());
         if (game.getBoard().getScore(currentColor) >= Integer.MAX_VALUE) {
-            System.out.println(currentColor);
+            boardGridPane.setDisable(true);
+            winLabel.setText(String.format("%s WIN", currentColor.getName()));
+            winLabel.setVisible(true);
+        } else {
+            currentColor = game.changeColor();
         }
-        currentColor = game.changeColor();
+    }
+
+    @FXML
+    void backToMainMenu(ActionEvent event) {
+        gamePane.setVisible(false);
+        helpMenu.setVisible(false);
+        winLabel.setVisible(false);
+        menu.setVisible(true);
     }
 
     @FXML
     void gameKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
-            gamePane.setVisible(false);
-            helpMenu.setVisible(false);
-            menu.setVisible(true);
+            backToMainMenu(new ActionEvent());
         }
     }
 
@@ -85,8 +98,9 @@ public class Controller {
     void actionStartButton2(ActionEvent event) {
         game = new Game(new Board(size), GameMode.UserUser, PlaceState.WHITE);
         currentColor = PlaceState.WHITE;
-        gridPane.getChildren().forEach(e -> {e.setStyle(PlaceState.AVAILABLE.getStyle());
-                                             e.setDisable(false);});
+        boardGridPane.setDisable(false);
+        boardGridPane.getChildren().forEach(e -> {e.setStyle(PlaceState.AVAILABLE.getStyle());
+                                                    e.setDisable(false);});
         menu.setVisible(false);
         gamePane.setVisible(true);
         continueButton.setDisable(false);
@@ -96,6 +110,9 @@ public class Controller {
     void actionContinueButton(ActionEvent event) {
         menu.setVisible(false);
         gamePane.setVisible(true);
+        if (game.getBoard().getScore(currentColor) >= Integer.MAX_VALUE) {
+            winLabel.setVisible(true);
+        }
     }
 
     @FXML
