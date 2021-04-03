@@ -8,15 +8,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import sample.game.Game;
 import sample.game.GameMode;
 import sample.game.board.Board;
 import sample.game.board.PlaceState;
 
 public class Controller {
 
-    private PlaceState color;
-    private Board board;
-    private GameMode gameMode;
+    private PlaceState currentColor;
+    private Game game;
 
     final int size = 19;
 
@@ -34,7 +34,7 @@ public class Controller {
     private AnchorPane menu;
 
     @FXML
-    private AnchorPane game;
+    private AnchorPane gamePane;
 
     @FXML
     private GridPane gridPane;
@@ -59,20 +59,18 @@ public class Controller {
     void actionEmptyPlaceButton(ActionEvent event) {
         Button emptyPlaceButton = (Button) event.getSource();
         emptyPlaceButton.setDisable(true);
-        board.putStone(color, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
-        emptyPlaceButton.setStyle(color.getStyle());
-        if (board.getScore(color) >= Integer.MAX_VALUE) {
-            System.out.println(color);
+        game.getBoard().putStone(currentColor, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
+        emptyPlaceButton.setStyle(currentColor.getStyle());
+        if (game.getBoard().getScore(currentColor) >= Integer.MAX_VALUE) {
+            System.out.println(currentColor);
         }
-        if (gameMode == GameMode.UserUser) {
-            color = color == PlaceState.WHITE ? PlaceState.BLACK : PlaceState.WHITE;
-        }
+        currentColor = game.changeColor();
     }
 
     @FXML
     void gameKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
-            game.setVisible(false);
+            gamePane.setVisible(false);
             helpMenu.setVisible(false);
             menu.setVisible(true);
         }
@@ -85,20 +83,19 @@ public class Controller {
 
     @FXML
     void actionStartButton2(ActionEvent event) {
-        board = new Board(size);
-        gameMode = GameMode.UserUser;
-        color = PlaceState.WHITE;
+        game = new Game(new Board(size), GameMode.UserUser, PlaceState.WHITE);
+        currentColor = PlaceState.WHITE;
         gridPane.getChildren().forEach(e -> {e.setStyle(PlaceState.AVAILABLE.getStyle());
                                              e.setDisable(false);});
         menu.setVisible(false);
-        game.setVisible(true);
+        gamePane.setVisible(true);
         continueButton.setDisable(false);
     }
 
     @FXML
     void actionContinueButton(ActionEvent event) {
         menu.setVisible(false);
-        game.setVisible(true);
+        gamePane.setVisible(true);
     }
 
     @FXML
