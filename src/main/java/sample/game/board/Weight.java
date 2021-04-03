@@ -1,5 +1,4 @@
 package sample.game.board;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

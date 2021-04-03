@@ -19,20 +19,12 @@ public class Board {
 
     public Board(int size) {
         this.size = size;
-        stoneBoards[ArrayType.Horizontals.getValue()] = new PlaceState[size][size];
-        stoneBoards[ArrayType.Vertical.getValue()] = new PlaceState[size][size];
-        stoneBoards[ArrayType.RightDiagonals.getValue()] = new PlaceState[size * 2 - 1][];
-        stoneBoards[ArrayType.LeftDiagonals.getValue()] = new PlaceState[size * 2 - 1][];
 
-        int tmpValue = size - 1;
-        for (int i = 0; i < stoneBoards[ArrayType.LeftDiagonals.getValue()].length; i++) {
-            final int diagonalSize = Math.abs(tmpValue - Math.abs(tmpValue - i)) + 1;
-            stoneBoards[ArrayType.LeftDiagonals.getValue()][i] = new PlaceState[diagonalSize];
-            stoneBoards[ArrayType.RightDiagonals.getValue()][i] = new PlaceState[diagonalSize];
-        }
-        for (PlaceState[][] stoneBoard : stoneBoards) {
-            for (PlaceState[] line : stoneBoard) {
-                Arrays.fill(line, null);
+        for (var type: ArrayType.values()) {
+            stoneBoards[type.getValue()] = new PlaceState[type.getFirstSize(size)][];
+            for (int firstIndex = 0; firstIndex < stoneBoards[type.getValue()].length; firstIndex++) {
+                stoneBoards[type.getValue()][firstIndex] = new PlaceState[type.getSecondSize(firstIndex, size)];
+                Arrays.fill(stoneBoards[type.getValue()][firstIndex], PlaceState.AVAILABLE);
             }
         }
     }
@@ -43,11 +35,10 @@ public class Board {
     }
 
     public void putStone(PlaceState color, int column, int line) {
-        if (stoneBoards[ArrayType.Vertical.getValue()][column][line] == null) {
-            stoneBoards[ArrayType.Vertical.getValue()][column][line] = color;
-            stoneBoards[ArrayType.Horizontals.getValue()][line][column] = color;
-            stoneBoards[ArrayType.LeftDiagonals.getValue()][size - 1 - column + line][Integer.min(line, column)] = color;
-            stoneBoards[ArrayType.RightDiagonals.getValue()][column + line][Integer.min(line, size - column - 1)] = color;
+        if (stoneBoards[ArrayType.Vertical.getValue()][column][line] == PlaceState.AVAILABLE) {
+            for (var type : ArrayType.values()) {
+                stoneBoards[type.getValue()][type.getFirstIndex(column, line, size)][type.getSecondIndex(column, line, size)] = color;
+            }
         } else {
             throw new BadPlaceException();
         }
