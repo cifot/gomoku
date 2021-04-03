@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import sample.game.GameMode;
 import sample.game.board.Board;
 import sample.game.board.PlaceState;
 
@@ -15,6 +16,7 @@ public class Controller {
 
     private PlaceState color;
     private Board board;
+    private GameMode gameMode;
 
     final int size = 19;
 
@@ -58,11 +60,13 @@ public class Controller {
         Button emptyPlaceButton = (Button) event.getSource();
         emptyPlaceButton.setDisable(true);
         board.putStone(color, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
+        emptyPlaceButton.setStyle(color.getStyle());
         if (board.getScore(color) >= Integer.MAX_VALUE) {
             System.out.println(color);
         }
-        emptyPlaceButton.setStyle(color.getStyle());
-        color = color == PlaceState.WHITE ? PlaceState.BLACK : PlaceState.WHITE;
+        if (gameMode == GameMode.UserUser) {
+            color = color == PlaceState.WHITE ? PlaceState.BLACK : PlaceState.WHITE;
+        }
     }
 
     @FXML
@@ -82,6 +86,7 @@ public class Controller {
     @FXML
     void actionStartButton2(ActionEvent event) {
         board = new Board(size);
+        gameMode = GameMode.UserUser;
         color = PlaceState.WHITE;
         gridPane.getChildren().forEach(e -> {e.setStyle(PlaceState.AVAILABLE.getStyle());
                                              e.setDisable(false);});
