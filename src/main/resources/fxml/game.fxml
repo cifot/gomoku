@@ -1966,7 +1966,7 @@
                               </Button>
                               <Label fx:id="winLabel" alignment="CENTER" onKeyPressed="#gameKeyPressed" prefHeight="54.0" prefWidth="160.0" style="-fx-alignment: CENTER;" styleClass="menu-button" stylesheets="@../styles/menuButton.css" text="BLACK WIN" textAlignment="CENTER" textFill="WHITE" visible="false" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                                  <font>
-                                    <Font name="Bodoni MT" size="24.0" />
+                                    <Font size="24.0" />
                                  </font>
                               </Label>
                            </children>

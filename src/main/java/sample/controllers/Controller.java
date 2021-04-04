@@ -1,6 +1,7 @@
 package sample.controllers;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -71,7 +72,7 @@ public class Controller {
         emptyPlaceButton.setStyle(currentColor.getStyle());
         if (game.getBoard().getScore(currentColor) >= Integer.MAX_VALUE) {
             boardGridPane.setDisable(true);
-            winLabel.setText(String.format("%s WIN", currentColor.getName()));
+            winLabel.setText(String.format("%s WIN", currentColor.toString()));
             winLabel.setVisible(true);
         } else {
             boardGridPane.setDisable(true);
@@ -137,9 +138,5 @@ public class Controller {
 
     @FXML
     void initialize() {
-    }
-
-    void emptyButtonAction() {
-
     }
 }

@@ -89,7 +89,7 @@ public class Board {
         for (Place[][] stoneBoard: stoneBoards) {
             for (Place[] line : stoneBoard) {
                 for (int j = 0; j < line.length; j++) {
-                    while (j < line.length && line[j].getColor() == color) {
+                    while (j < line.length && line[j].getColor() != color) {
                         j++;
                     }
                     int startPos = j;
@@ -100,7 +100,6 @@ public class Board {
                 }
             }
         }
-        System.out.println(score);
         return score;
     }
 }

@@ -13,6 +13,13 @@ public class Place {
     @Setter
     Color color;
 
+    @Override
+    public String toString() {
+        return "Place{" +
+                "color=" + color +
+                '}';
+    }
+
     public Place() {
         Arrays.fill(canPlace, true);
         color = Color.EMPTY;
