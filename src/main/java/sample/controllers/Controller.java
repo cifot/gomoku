@@ -17,6 +17,7 @@ import sample.game.board.Board;
 import sample.game.board.Color;
 import sample.game.board.Place;
 import sample.game.rulesData.Rule;
+import sample.game.rulesData.rules.captures.Capture;
 import sample.game.rulesData.rules.freeThrees.FreeThrees;
 
 public class Controller {
@@ -68,7 +69,7 @@ public class Controller {
     void actionEmptyPlaceButton(ActionEvent event) {
         Button emptyPlaceButton = (Button) event.getSource();
         emptyPlaceButton.setDisable(true);
-        game.getBoard().putStone(currentColor, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
+        game.putStone(currentColor, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
         emptyPlaceButton.setStyle(currentColor.getStyle());
         if (game.getBoard().getScore(currentColor) >= Integer.MAX_VALUE) {
             boardGridPane.setDisable(true);
@@ -77,10 +78,8 @@ public class Controller {
         } else {
             boardGridPane.setDisable(true);
             currentColor = game.changeColor();
-            game.updateBoard();
             updatePossiblePlaces();
             boardGridPane.setDisable(false);
-
         }
     }
 
@@ -90,6 +89,7 @@ public class Controller {
             int line = GridPane.getRowIndex(visualPlace);
             Place backendPlace = game.getBoard().getStoneBoard()[column][line];
             visualPlace.setDisable(!backendPlace.getCanPlace()[currentColor.ordinal()]);
+            visualPlace.setStyle(backendPlace.getColor().getStyle());
         });
     }
 
@@ -117,8 +117,9 @@ public class Controller {
     void actionStartButton2(ActionEvent event) {
         var rules = new ArrayList<Rule>();
         rules.add(new FreeThrees());
+        rules.add(new Capture());
         game = new Game(new Board(size), GameMode.UserUser, Color.WHITE, rules);
-        currentColor = Color.WHITE;
+        currentColor = game.getCurrentColor();
         boardGridPane.setDisable(false);
         boardGridPane.getChildren().forEach(e -> {e.setStyle(Color.EMPTY.getStyle());
                                                     e.setDisable(false);});
