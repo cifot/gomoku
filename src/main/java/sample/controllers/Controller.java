@@ -1,5 +1,6 @@
 package sample.controllers;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,11 +13,14 @@ import javafx.scene.layout.GridPane;
 import sample.game.Game;
 import sample.game.GameMode;
 import sample.game.board.Board;
-import sample.game.board.PlaceState;
+import sample.game.board.Color;
+import sample.game.board.Place;
+import sample.game.rulesData.Rule;
+import sample.game.rulesData.rules.freeThrees.FreeThrees;
 
 public class Controller {
 
-    private PlaceState currentColor;
+    private Color currentColor;
     private Game game;
 
     final int size = 19;
@@ -70,8 +74,22 @@ public class Controller {
             winLabel.setText(String.format("%s WIN", currentColor.getName()));
             winLabel.setVisible(true);
         } else {
+            boardGridPane.setDisable(true);
             currentColor = game.changeColor();
+            game.updateBoard();
+            updatePossiblePlaces();
+            boardGridPane.setDisable(false);
+
         }
+    }
+
+    private void updatePossiblePlaces() {
+        boardGridPane.getChildren().forEach( visualPlace -> {
+            int column = GridPane.getColumnIndex(visualPlace);
+            int line = GridPane.getRowIndex(visualPlace);
+            Place backendPlace = game.getBoard().getStoneBoard()[column][line];
+            visualPlace.setDisable(!backendPlace.getCanPlace()[currentColor.ordinal()]);
+        });
     }
 
     @FXML
@@ -96,10 +114,12 @@ public class Controller {
 
     @FXML
     void actionStartButton2(ActionEvent event) {
-        game = new Game(new Board(size), GameMode.UserUser, PlaceState.WHITE);
-        currentColor = PlaceState.WHITE;
+        var rules = new ArrayList<Rule>();
+        rules.add(new FreeThrees());
+        game = new Game(new Board(size), GameMode.UserUser, Color.WHITE, rules);
+        currentColor = Color.WHITE;
         boardGridPane.setDisable(false);
-        boardGridPane.getChildren().forEach(e -> {e.setStyle(PlaceState.AVAILABLE.getStyle());
+        boardGridPane.getChildren().forEach(e -> {e.setStyle(Color.EMPTY.getStyle());
                                                     e.setDisable(false);});
         menu.setVisible(false);
         gamePane.setVisible(true);

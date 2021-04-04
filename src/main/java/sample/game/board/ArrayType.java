@@ -7,9 +7,7 @@ import sample.game.exception.GomokuException;
 @AllArgsConstructor
 @Getter
 public enum ArrayType {
-    LeftDiagonals(0), RightDiagonals(1), Horizontals(2), Vertical(3);
-
-    private final int value;
+    LeftDiagonals, RightDiagonals, Horizontals, Vertical;
 
     public int getFirstIndex(int column, int line, int size) {
         switch (this) {
