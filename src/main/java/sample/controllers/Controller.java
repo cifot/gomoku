@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -51,6 +54,9 @@ public class Controller {
     private AnchorPane gamePane;
 
     @FXML
+    private AnchorPane captureBlock;
+
+    @FXML
     private GridPane boardGridPane;
 
     @FXML
@@ -61,6 +67,19 @@ public class Controller {
 
     @FXML
     private Button startButton2;
+
+    @FXML
+    private Label blackCaptureScore;
+
+    @FXML
+    private Label whiteCaptureScore;
+
+    @FXML
+    private CheckBox freeThreesCheckBox;
+
+    @FXML
+    private ChoiceBox<String> captureChoiceBox;
+
 
 
     @FXML
@@ -77,7 +96,11 @@ public class Controller {
         emptyPlaceButton.setStyle(currentColor.getStyle());
         boardGridPane.setDisable(true);
         Color enemyColor = game.changeColor();
-        updatePossiblePlaces();
+        updatePossiblePlaces(enemyColor);
+        if (captureBlock.isVisible()) {
+            whiteCaptureScore.setText(Long.toString(game.getCaptureScore(Color.WHITE)));
+            blackCaptureScore.setText(Long.toString(game.getCaptureScore(Color.BLACK)));
+        }
         if (game.isWin(currentColor) && (game.wasLastChance(currentColor) || !game.hasLastChance(enemyColor))) {
             winLabel.setText(String.format("%s WIN", currentColor.toString()));
             winLabel.setVisible(true);
@@ -87,12 +110,12 @@ public class Controller {
         currentColor = enemyColor;
     }
 
-    private void updatePossiblePlaces() {
+    private void updatePossiblePlaces(Color color) {
         boardGridPane.getChildren().forEach( visualPlace -> {
             int column = GridPane.getColumnIndex(visualPlace);
             int line = GridPane.getRowIndex(visualPlace);
             Place backendPlace = game.getBoard().getStoneBoard()[column][line];
-            visualPlace.setDisable(!backendPlace.getCanPlace()[currentColor.ordinal()]);
+            visualPlace.setDisable(!backendPlace.getCanPlace()[color.ordinal()]);
             visualPlace.setStyle(backendPlace.getColor().getStyle());
         });
     }
@@ -121,9 +144,16 @@ public class Controller {
     void actionStartButton2(ActionEvent event) {
         var rules = new ArrayList<Rule>();
         try {
-            rules.add(new FreeThrees(objectMapper.readValue(getClass().getResource("../../rulePatterns/freeThreesPattern.json"), RulePattern[][].class)));
-            rules.add(new Capture(10, 2, true,
-                    objectMapper.readValue(getClass().getResource("../../rulePatterns/capture2Pattern.json"), RulePattern[][].class)));
+            if (freeThreesCheckBox.isSelected())
+                rules.add(new FreeThrees(objectMapper.readValue(getClass().getResource("../../rulePatterns/freeThreesPattern.json"), RulePattern[][].class)));
+            captureBlock.setVisible(true);
+            switch (captureChoiceBox.getValue()) {
+                case "None" -> captureBlock.setVisible(false);
+                case "Capture" -> rules.add(new Capture(10, 2, false,
+                        objectMapper.readValue(getClass().getResource("../../rulePatterns/capture2Pattern.json"), RulePattern[][].class)));
+                case "Game-ending capture" ->rules.add(new Capture(10, 2, true,
+                        objectMapper.readValue(getClass().getResource("../../rulePatterns/capture2Pattern.json"), RulePattern[][].class)));
+            }
             rules.add(new ClassicWinRule(new Weight(5, 3)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,5 +177,7 @@ public class Controller {
 
     @FXML
     void initialize() {
+        captureChoiceBox.setItems(FXCollections.observableArrayList("None", "Capture", "Game-ending capture"));
+        captureChoiceBox.setValue("None");
     }
 }

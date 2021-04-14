@@ -23,7 +23,6 @@ public class FreeThrees extends Rule
     public void updateBoard(Board board) {
         int size = board.getSize();
         Place[][] stoneBoard = board.getStoneBoard();
-
         for (int column = 0; column < size; column++) {
             for (int line = 0; line < size; line++) {
                 if (stoneBoard[column][line].getColor() == Color.EMPTY) {

@@ -66,7 +66,6 @@ public class Capture extends Rule
     public boolean hasChance(Board board, Color color, List<WinRule> winRules) {
         if (!this.hasEndGameCapture)
             return false;
-        System.out.println(color);
         Place[][] stoneBoard = board.getStoneBoard();
         int size = board.getSize();
         for (int column = 0; column < size; column++) {

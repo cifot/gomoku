@@ -9,6 +9,7 @@ import sample.game.rulesData.interfaces.ActionAfterPutStoneRule;
 import sample.game.rulesData.interfaces.PossiblePlaceRule;
 import sample.game.rulesData.interfaces.WinRule;
 import sample.game.rulesData.rules.Rule;
+import sample.game.rulesData.rules.captures.Capture;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +55,14 @@ public class Game {
     }
     public boolean wasLastChance(Color color) {
         return wasLastChance[color.ordinal()];
+    }
+
+    public long getCaptureScore(Color color) {
+        var capture =rules.stream()
+                .filter(rule -> rule instanceof Capture)
+                .map(rule -> (Capture) rule)
+                .collect(Collectors.toList());
+        return capture.get(0).getScore(board, color);
     }
 
     public void updateBoard() {
