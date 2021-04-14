@@ -1,6 +1,8 @@
 package sample.game.board;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -42,16 +44,16 @@ import lombok.Getter;
  * </p>
  */
 @Getter
+@AllArgsConstructor
 public class Board {
-    Weight weight = new Weight(5, 3);
     final int size;
-    final int winLength = 5;
+    final int winLength;
     Place[][][] stoneBoards = new Place[ArrayType.values().length][][];
     Place[][] stoneBoard;
 
 
-    public Board(int size) {
-
+    public Board(int size, int winLength) {
+        this.winLength = winLength;
         this.size = size;
         stoneBoard = new Place[size][size];
         for (Place[] line : stoneBoard) {
@@ -75,31 +77,53 @@ public class Board {
         }
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public void print() {
+        System.out.println("Start");
+        StringBuilder[] out = new StringBuilder[size];
+        for (int i = 0; i < size; i++) {
+            out[i] = new StringBuilder();
+        }
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                ArrayType arrayType = ArrayType.Vertical;
+                switch (stoneBoards[arrayType.ordinal()][arrayType.getFirstIndex(i, j, size)][arrayType.getSecondIndex(i, j, size)].getColor()) {
+                    case BLACK -> out[i].append('B');
+                    case WHITE -> out[i].append('W');
+                    case EMPTY -> out[i].append('*');
+                }
+            }
+        }
+        for (StringBuilder s : out) {
+            System.out.println(s);
+        }
+    }
+
+    public Board clone() {
+        Place[][][] stoneBoards = new Place[ArrayType.values().length][][];
+        Place[][] stoneBoard = new Place[this.size][this.size];
+        for (int i = 0; i < this.stoneBoard.length; i++) {
+            for (int j = 0; j < this.stoneBoard.length; j++) {
+                stoneBoard[i][j] = this.stoneBoard[i][j].clone();
+            }
+        }
+        for (var type: ArrayType.values()) {
+            stoneBoards[type.ordinal()] = new Place[type.getFirstSize(size)][];
+            Place[][] currentBoard = stoneBoards[type.ordinal()];
+            for (int firstIndex = 0; firstIndex < currentBoard.length; firstIndex++) {
+                currentBoard[firstIndex] = new Place[type.getSecondSize(firstIndex, size)];
+            }
+            for (int column = 0; column < size; column++) {
+                for (int line = 0; line < size; line++) {
+                    int firstIndex = type.getFirstIndex(column, line, size);
+                    int secondIndex = type.getSecondIndex(column, line, size);
+                    currentBoard[firstIndex][secondIndex] = stoneBoard[column][line];
+                }
+            }
+        }
+        return new  Board(this.size, this.winLength, stoneBoards, stoneBoard);
     }
 
     public void putStone(Color color, int column, int line) {
         stoneBoard[column][line].putStone(color);
-    }
-
-    public long getScore(Color color) {
-        long score = 0L;
-        for (Place[][] stoneBoard: stoneBoards) {
-            for (Place[] line : stoneBoard) {
-                for (int j = 0; j < line.length; j++) {
-                    while (j < line.length && line[j].getColor() != color) {
-                        j++;
-                    }
-                    int startPos = j;
-                    while (j < line.length && line[j].getColor() == color) {
-                        j++;
-                    }
-                    score += weight.getWeight(j - startPos);
-                }
-            }
-        }
-        return score;
     }
 }

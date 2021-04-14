@@ -1,8 +1,9 @@
 package sample.controllers;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.ResourceBundle;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,15 +17,18 @@ import sample.game.GameMode;
 import sample.game.board.Board;
 import sample.game.board.Color;
 import sample.game.board.Place;
-import sample.game.rulesData.Rule;
+import sample.game.rulesData.Weight;
+import sample.game.rulesData.rules.Rule;
+import sample.game.rulesData.RulePattern;
 import sample.game.rulesData.rules.captures.Capture;
+import sample.game.rulesData.rules.classicWinRule.ClassicWinRule;
 import sample.game.rulesData.rules.freeThrees.FreeThrees;
 
 public class Controller {
 
     private Color currentColor;
     private Game game;
-
+    final ObjectMapper objectMapper = new ObjectMapper();
     final int size = 19;
 
 
@@ -71,16 +75,16 @@ public class Controller {
         emptyPlaceButton.setDisable(true);
         game.putStone(currentColor, GridPane.getColumnIndex(emptyPlaceButton), GridPane.getRowIndex(emptyPlaceButton));
         emptyPlaceButton.setStyle(currentColor.getStyle());
-        if (game.getBoard().getScore(currentColor) >= Integer.MAX_VALUE) {
-            boardGridPane.setDisable(true);
+        boardGridPane.setDisable(true);
+        Color enemyColor = game.changeColor();
+        updatePossiblePlaces();
+        if (game.isWin(currentColor) && (game.wasLastChance(currentColor) || !game.hasLastChance(enemyColor))) {
             winLabel.setText(String.format("%s WIN", currentColor.toString()));
             winLabel.setVisible(true);
         } else {
-            boardGridPane.setDisable(true);
-            currentColor = game.changeColor();
-            updatePossiblePlaces();
             boardGridPane.setDisable(false);
         }
+        currentColor = enemyColor;
     }
 
     private void updatePossiblePlaces() {
@@ -116,9 +120,16 @@ public class Controller {
     @FXML
     void actionStartButton2(ActionEvent event) {
         var rules = new ArrayList<Rule>();
-        rules.add(new FreeThrees());
-        rules.add(new Capture());
-        game = new Game(new Board(size), GameMode.UserUser, Color.WHITE, rules);
+        try {
+            rules.add(new FreeThrees(objectMapper.readValue(getClass().getResource("../../rulePatterns/freeThreesPattern.json"), RulePattern[][].class)));
+            rules.add(new Capture(10, 2, true,
+                    objectMapper.readValue(getClass().getResource("../../rulePatterns/capture2Pattern.json"), RulePattern[][].class)));
+            rules.add(new ClassicWinRule(new Weight(5, 3)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+        game = new Game(new Board(size, 5), GameMode.UserUser, Color.WHITE, rules);
         currentColor = game.getCurrentColor();
         boardGridPane.setDisable(false);
         boardGridPane.getChildren().forEach(e -> {e.setStyle(Color.EMPTY.getStyle());
@@ -132,9 +143,6 @@ public class Controller {
     void actionContinueButton(ActionEvent event) {
         menu.setVisible(false);
         gamePane.setVisible(true);
-        if (game.getBoard().getScore(currentColor) >= Integer.MAX_VALUE) {
-            winLabel.setVisible(true);
-        }
     }
 
     @FXML

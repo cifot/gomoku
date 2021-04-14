@@ -1,4 +1,4 @@
-package sample.game.board;
+package sample.game.rulesData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -7,6 +7,7 @@ import lombok.Getter;
 public class Weight {
     private final long winLength;
     private final long multiplier;
+
 
     public long getWeight(int length) {
         if (length >= winLength)

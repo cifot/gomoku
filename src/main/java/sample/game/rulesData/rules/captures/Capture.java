@@ -1,40 +1,27 @@
 package sample.game.rulesData.rules.captures;
 
+import lombok.AllArgsConstructor;
 import sample.game.board.ArrayType;
 import sample.game.board.Board;
 import sample.game.board.Color;
 import sample.game.board.Place;
-import sample.game.rulesData.Rule;
+import sample.game.rulesData.rules.Rule;
 import sample.game.rulesData.RulePattern;
-import sample.game.rulesData.interfaces.ActionAfterPutStone;
+import sample.game.rulesData.interfaces.ActionAfterPutStoneRule;
+import sample.game.rulesData.interfaces.WinRule;
 
 import java.util.Arrays;
+import java.util.List;
 
+@AllArgsConstructor
 public class Capture extends Rule
-    implements ActionAfterPutStone {
+    implements ActionAfterPutStoneRule, WinRule {
 
-    private final Color[] colors = new Color[] {Color.WHITE, Color.BLACK};
-    private final Color[] invertColors = new Color[] {Color.BLACK, Color.WHITE};
-
-    private final int countPatterns = 2;
-    private final RulePattern[][] patterns = new RulePattern[colors.length][countPatterns];
-
-    public Capture() {
-        for (int i = 0; i < patterns.length; i++) {
-            patterns[i][0] = new RulePattern(new Color[] {
-                    colors[i],
-                    invertColors[i],
-                    invertColors[i],
-                    colors[i]},
-                    0);
-            patterns[i][1] = new RulePattern(new Color[] {
-                    colors[i],
-                    invertColors[i],
-                    invertColors[i],
-                    colors[i]},
-                    3);
-        }
-    }
+    private final int[] countCaptureStones = new int[Color.values().length - 1];
+    private final int winCount;
+    private final int sizeCapture;
+    private final boolean hasEndGameCapture;
+    private final RulePattern[][] patterns;
 
     @Override
     public void actionAfterPutStone(Board board, Color color, int column, int line) {
@@ -42,7 +29,6 @@ public class Capture extends Rule
         Place[][][] stoneBoards = board.getStoneBoards();
         int size = board.getSize();
 
-        System.out.println(color);
         for (ArrayType arrayType : ArrayType.values()) {
             int secondIndex = arrayType.getSecondIndex(column, line, size);
             int firstIndex = arrayType.getFirstIndex(column, line, size);
@@ -51,17 +37,52 @@ public class Capture extends Rule
             for (RulePattern pattern : patterns[color.ordinal()]) {
                 if (pattern.checkMatchPattern(boardLine, secondIndex)) {
                     int startIndex;
+                    countCaptureStones[color.ordinal()] += sizeCapture;
                     if (pattern.getIndex() == 0) {
-                        startIndex = 1;
+                        startIndex = secondIndex + 1;
                     } else {
-                        startIndex = -2;
+                        startIndex = secondIndex - sizeCapture;
                     }
-                    boardLine[secondIndex + startIndex].setColor(Color.EMPTY);
-                    Arrays.fill(boardLine[secondIndex + startIndex].getCanPlace(), true);
-                    boardLine[secondIndex + startIndex + 1].setColor(Color.EMPTY);
-                    Arrays.fill(boardLine[secondIndex + startIndex + 1].getCanPlace(), true);
+                    for (int i = 0; i < sizeCapture; i++) {
+                        boardLine[startIndex + i].setColor(Color.EMPTY);
+                        Arrays.fill(boardLine[startIndex + i].getCanPlace(), true);
+                    }
                 }
             }
         }
+    }
+
+    @Override
+    public boolean isWin(Board board, Color color) {
+        return getScore(board, color) >= winCount;
+    }
+
+    @Override
+    public long getScore(Board board, Color color) {
+        return  countCaptureStones[color.ordinal()];
+    }
+
+    @Override
+    public boolean hasChance(Board board, Color color, List<WinRule> winRules) {
+        if (!this.hasEndGameCapture)
+            return false;
+        System.out.println(color);
+        Place[][] stoneBoard = board.getStoneBoard();
+        int size = board.getSize();
+        for (int column = 0; column < size; column++) {
+            for (int line = 0; line < size; line++) {
+                if (stoneBoard[column][line].getCanPlace()[color.ordinal()]) {
+                    Board newBoard  = board.clone();
+                    newBoard.putStone(color, column, line);
+                    if (RulePattern.checkMatchBoardPattern(newBoard, column, line, patterns[color.ordinal()])) {
+                        return true;
+                    }
+                    if (winRules.stream().anyMatch(winRule -> winRule.isWin(newBoard, color))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
