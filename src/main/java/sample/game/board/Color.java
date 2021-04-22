@@ -15,5 +15,8 @@ public enum Color {
             "-fx-pref-height: 18.0;" +
             "-fx-background-color: #c0c0c0;");
 
+    public  Color getEnemyColor() {
+        return this == Color.BLACK ? Color.WHITE : Color.BLACK;
+    }
     private final String style;
 }

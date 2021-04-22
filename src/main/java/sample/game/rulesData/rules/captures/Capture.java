@@ -21,6 +21,7 @@ public class Capture extends Rule
     private final int winCount;
     private final int sizeCapture;
     private final boolean hasEndGameCapture;
+    private final long multiplier;
     private final RulePattern[][] patterns;
 
     @Override
@@ -60,6 +61,11 @@ public class Capture extends Rule
     @Override
     public long getScore(Board board, Color color) {
         return  countCaptureStones[color.ordinal()];
+    }
+
+    @Override
+    public long getMiniMaxScore(Board board, Color color) {
+        return countCaptureStones[color.ordinal()] * multiplier;
     }
 
     @Override

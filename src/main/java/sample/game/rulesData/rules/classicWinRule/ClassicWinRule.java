@@ -43,6 +43,31 @@ public class ClassicWinRule extends Rule
     }
 
     @Override
+    public long getMiniMaxScore(Board board, Color color) {
+        Place[][][] stoneBoards = board.getStoneBoards();
+        long score = 0L;
+        for (Place[][] stoneBoard: stoneBoards) {
+            for (Place[] line : stoneBoard) {
+                for (int j = 0; j < line.length; j++) {
+                    while (j < line.length && line[j].getColor() != color) {
+                        j++;
+                    }
+                    int startPos = j;
+                    while (j < line.length && line[j].getColor() == color) {
+                        j++;
+                    }
+                    if (j - startPos >= 5) {
+                        score += Integer.MAX_VALUE;
+                    } else {
+                        score += weight.getWeight(j - startPos);
+                    }
+                }
+            }
+        }
+        return score;
+    }
+
+    @Override
     public boolean hasChance(Board board, Color color, List<WinRule> winRules) {
         return false;
     }

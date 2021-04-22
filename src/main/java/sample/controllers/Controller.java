@@ -1,6 +1,7 @@
 package sample.controllers;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -105,9 +106,14 @@ public class Controller {
             winLabel.setText(String.format("%s WIN", currentColor.toString()));
             winLabel.setVisible(true);
         } else {
+            if (game.getGameMode() == GameMode.UserUser) {
+                currentColor = enemyColor;
+            } else {
+                currentColor = game.putComputerStone();
+                updatePossiblePlaces(enemyColor);
+            }
             boardGridPane.setDisable(false);
         }
-        currentColor = enemyColor;
     }
 
     private void updatePossiblePlaces(Color color) {
@@ -135,13 +141,7 @@ public class Controller {
         }
     }
 
-    @FXML
-    void actionStartButton1(ActionEvent event) {
-
-    }
-
-    @FXML
-    void actionStartButton2(ActionEvent event) {
+    private List<Rule> initRules() {
         var rules = new ArrayList<Rule>();
         try {
             if (freeThreesCheckBox.isSelected())
@@ -149,24 +149,42 @@ public class Controller {
             captureBlock.setVisible(true);
             switch (captureChoiceBox.getValue()) {
                 case "None" -> captureBlock.setVisible(false);
-                case "Capture" -> rules.add(new Capture(10, 2, false,
+                case "Capture" -> rules.add(new Capture(10, 2, false, 10L,
                         objectMapper.readValue(getClass().getResource("../../rulePatterns/capture2Pattern.json"), RulePattern[][].class)));
-                case "Game-ending capture" ->rules.add(new Capture(10, 2, true,
+                case "Game-ending capture" ->rules.add(new Capture(10, 2, true, 10L,
                         objectMapper.readValue(getClass().getResource("../../rulePatterns/capture2Pattern.json"), RulePattern[][].class)));
             }
-            rules.add(new ClassicWinRule(new Weight(5, 3)));
+            rules.add(new ClassicWinRule(new Weight(5, 10)));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
-        game = new Game(new Board(size, 5), GameMode.UserUser, Color.WHITE, rules);
-        currentColor = game.getCurrentColor();
+        return rules;
+    }
+
+    private void startGame() {
         boardGridPane.setDisable(false);
         boardGridPane.getChildren().forEach(e -> {e.setStyle(Color.EMPTY.getStyle());
-                                                    e.setDisable(false);});
+            e.setDisable(false);});
         menu.setVisible(false);
         gamePane.setVisible(true);
         continueButton.setDisable(false);
+    }
+
+    @FXML
+    void actionStartButton1(ActionEvent event) {
+        List<Rule> rules = initRules();
+        game = new Game(new Board(size, 5), GameMode.UserComputer, Color.WHITE, rules);
+        currentColor = game.getCurrentColor();
+        startGame();
+    }
+
+    @FXML
+    void actionStartButton2(ActionEvent event) {
+        List<Rule> rules = initRules();
+        game = new Game(new Board(size, 5), GameMode.UserUser, Color.WHITE, rules);
+        currentColor = game.getCurrentColor();
+        startGame();
     }
 
     @FXML
